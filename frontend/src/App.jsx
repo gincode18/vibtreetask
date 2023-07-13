@@ -2,14 +2,55 @@ import { useState } from "react";
 
 import Logo from "./assets/otp.png";
 import "./App.css";
-import Button from "./Button";
 
 function App() {
   const [form, setForm] = useState({
     number: "",
   });
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  const mongoose= async () => {
+    const response = await fetch('http://localhost:3000/api/inventory', {
+         method: 'POST',
+         headers: {
+           'Content-Type': 'application/json',
+         },
+         body: JSON.stringify({ 
+           number:form.number,
+         }),
+       });
+       
+       
+     };
+  const otp= async () => {
+ const response = await fetch('http://localhost:3000/api/otp', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ 
+        number:form.number,
+      }),
+    });
+    mongoose();
+    console.log(response);
+    
+  };
 
+ 
+  const call= async () => {
+    const response = await fetch('http://localhost:3000/api/call', {
+         method: 'POST',
+         headers: {
+           'Content-Type': 'application/json',
+         },
+         body: JSON.stringify({ 
+           number:form.number,
+         }),
+       });
+       mongoose();
+
+       console.log(response);
+     };
   return (
     <div className=" pt-[5%] m-7 div">
       <div className="card card-side bg-base-100 shadow-xl  shadow-purple-500 ">
@@ -31,8 +72,8 @@ function App() {
             />
           </form>
           <div className="card-actions justify-end absolute top-[60%]">
-            <button className="btn btn-primary">Mobile OTP</button>
-            <button className="btn btn-primary">VOice Message</button>
+            <button className="btn btn-primary" onClick={otp}>Mobile OTP</button>
+            <button className="btn btn-primary" onClick={call}>VOice Message</button>
 
           </div>
         </div>
