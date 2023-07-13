@@ -9,6 +9,7 @@ var sid = process.env.Sid;
 var token = process.env.Token;
 var twilionumber = process.env.number;
 var twilio = require("twilio")(sid, token);
+
 // Initialize the app
 const app = express();
 
@@ -59,8 +60,36 @@ const inventoryItemSchema = new mongoose.Schema({
 const InventoryItem = mongoose.model("InventoryItem", inventoryItemSchema);
 
 // Routes
+//send voice calls
+// app.get('/voice-call', (req, res) => {
+//   const twiml = new twilio.twiml.VoiceResponse();
+//   twiml.say('Hello! This is a test voice call.'); // Add your TwiML instructions here
+  
+//   res.type('text/xml');
+//   res.send(twiml.toString());
+// });
+app.post("/api/call", async (req, res) => {
+  const number = req.body.number;
+  const otp = generateOTP(6);
+
+  try {
+    twilio.calls
+  .create({
+    twiml: `<Response><Say>${otp}</Say></Response>`,
+    to: number,
+    from: twilionumber,
+  })
+  .then(call => {console.log('Call SID:', call.sid)
+  res.send(call)})
+  .catch(error => console.error('Error making call:', error));
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 //send mobile otp
-app.post("/api/otp", async (req, res) => {
+
+});app.post("/api/otp", async (req, res) => {
   const number = req.body.number;
   const otp = generateOTP(6);
 
