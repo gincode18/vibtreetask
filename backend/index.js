@@ -30,6 +30,7 @@ function generateOTP(length) {
 
   return otpArray.join("");
 }
+const otp = generateOTP(6);
 
 // twilio.messages.create({
 //   from:twilionumber,
@@ -64,34 +65,33 @@ const InventoryItem = mongoose.model("InventoryItem", inventoryItemSchema);
 // app.get('/voice-call', (req, res) => {
 //   const twiml = new twilio.twiml.VoiceResponse();
 //   twiml.say('Hello! This is a test voice call.'); // Add your TwiML instructions here
-  
+
 //   res.type('text/xml');
 //   res.send(twiml.toString());
 // });
 app.post("/api/call", async (req, res) => {
   const number = req.body.number;
-  const otp = generateOTP(6);
 
   try {
     twilio.calls
-  .create({
-    twiml: `<Response><Say>${otp}</Say></Response>`,
-    to: number,
-    from: twilionumber,
-  })
-  .then(call => {console.log('Call SID:', call.sid)
-  res.send(call)})
-  .catch(error => console.error('Error making call:', error));
-
+      .create({
+        twiml: `<Response><Say>${otp}</Say></Response>`,
+        to: number,
+        from: twilionumber,
+      })
+      .then((call) => {
+        console.log("Call SID:", call.sid);
+        res.send(call);
+      })
+      .catch((error) => console.error("Error making call:", error));
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Internal server error" });
   }
-//send mobile otp
-
-});app.post("/api/otp", async (req, res) => {
+  //send mobile otp
+});
+app.post("/api/otp", async (req, res) => {
   const number = req.body.number;
-  const otp = generateOTP(6);
 
   try {
     twilio.messages
@@ -100,12 +100,32 @@ app.post("/api/call", async (req, res) => {
         to: number,
         body: otp,
       })
-      .then(() => {
-        res.json({ code: "1", mess: "message sent" });
+      .then(async (message) => {
+        console.log("Message SID:", message.sid);
+        console.log("Message status:", message.status);
+        await setTimeout(()=>{},1000)
+
+        // Check the message status
+        if (message.status === "failed") {
+          // Send a voice call with the same message content
+          client.calls
+            .create({
+              to: toNumber,
+              from: fromNumber,
+              twiml: `<Response><Say>${otp}</Say></Response>`,
+            })
+            .then((call) => {
+              console.log("Call SID:", call.sid);
+              console.log("Call status:", call.status);
+            })
+            .catch((error) => {
+              console.error("Error making call:", error);
+            });
+        }
+        res.send(message)
       })
-      .catch((err) => {
-        const mess = { code:"0",mess: "please verify your number with" };
-        res.json(mess);
+      .catch((error) => {
+        res.send({error,message:"The number  is unverified. Trial accounts cannot send messages to unverified numbers"})
       });
   } catch (error) {
     console.log(error);
