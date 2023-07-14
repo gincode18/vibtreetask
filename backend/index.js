@@ -83,7 +83,9 @@ app.post("/api/call", async (req, res) => {
         console.log("Call SID:", call.sid);
         res.send(call);
       })
-      .catch((error) => console.error("Error making call:", error));
+      .catch((error) => {
+        res.send({error,message:"The number  is unverified. Trial accounts cannot send messages to unverified numbers"})
+      });
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Internal server error" });
