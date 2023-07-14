@@ -9,7 +9,7 @@ function App() {
   });
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
   const mongoose= async () => {
-    const response = await fetch('http://localhost:3000/api/inventory', {
+    const response = await fetch('https://vibtree.onrender.com/api/inventory', {
          method: 'POST',
          headers: {
            'Content-Type': 'application/json',
@@ -22,7 +22,7 @@ function App() {
        
      };
   const otp= async () => {
- const response = await fetch('http://localhost:3000/api/otp', {
+ const response = await fetch('https://vibtree.onrender.com/api/otp', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -38,7 +38,7 @@ function App() {
 
  
   const call= async () => {
-    const response = await fetch('http://localhost:3000/api/call', {
+    const response = await fetch('https://vibtree.onrender.com/api/call', {
          method: 'POST',
          headers: {
            'Content-Type': 'application/json',
